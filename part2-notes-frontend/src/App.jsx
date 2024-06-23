@@ -6,10 +6,12 @@ import service from './services/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
-  console.log('🚀 ~ App ~ persons:', persons.length)
   const [newName, setNewName] = useState('')
   const [newPhone, setnewPhone] = useState('')
   const [search, setSearch] = useState('')
+  const [createdSuccess, setcreatedSuccess] = useState('')
+  const [modifiedSuccess, setmodifiedSuccess] = useState('')
+  const [errorMessage, seterrorMessage] = useState('')
 
   const handleOnChangeSearch = e => {
     setSearch(e.target.value)
@@ -23,6 +25,7 @@ const App = () => {
   }
 
   const handleSubmit = e => {
+    // try {
     e.preventDefault()
     const personObject = {
       name: newName,
@@ -37,16 +40,38 @@ const App = () => {
             `${newName} is already added to phonebook, replace the old number with a new one?`
           )
         ) {
+          // try {
           const updatePersons = { ...personExist, phone: newPhone }
-          service.update(personExist.id, updatePersons).then(response => {
-            setPersons(
-              persons.map(person =>
-                person.id !== personExist.id ? person : response.data
+          service
+            .update(personExist.id, updatePersons)
+            .then(response => {
+              setPersons(
+                persons.map(person =>
+                  person.id !== personExist.id ? person : response.data
+                )
               )
-            )
-            setNewName('')
-            setnewPhone('')
-          })
+              setNewName('')
+              setnewPhone('')
+              setmodifiedSuccess(
+                `The phone of ${personExist.name} modified with successs`
+              )
+              setTimeout(() => {
+                setmodifiedSuccess('')
+              }, 4000)
+            })
+            .catch(error => {
+              seterrorMessage(
+                'The information of user has already been removed from server'
+              )
+              setTimeout(() => {
+                seterrorMessage('')
+              }, 4000)
+            })
+          // } catch (error) {
+          //   seterrorMessage(
+          //     ' the information of user has already been removed from server '
+          //   )
+          // }
         }
       } else {
         window.confirm(
@@ -58,14 +83,24 @@ const App = () => {
         setPersons([...persons, response.data])
         setNewName('')
         setnewPhone('')
+        setcreatedSuccess(`Added ${newName} `)
+        setTimeout(() => {
+          setcreatedSuccess(null)
+        }, 4000)
       })
     }
+    // } catch (error) {
+    //   seterrorMessage(
+    //     ' the information of user has already been removed from server '
+    //   )
+    //   setTimeout(() => {
+    //     seterrorMessage('')
+    //   }, 4000)
+    // }
   }
 
   useEffect(() => {
-    console.log('effect')
     service.getAll().then(response => {
-      console.log('promise fulfilled', response)
       setPersons(response.data)
     })
   }, [])
@@ -80,9 +115,29 @@ const App = () => {
   const filteredPersons = persons.filter(person =>
     person?.name.toLowerCase().includes(search.toLowerCase())
   )
+  const successMessage = {
+    color: 'green',
+    fontStyle: 'italic',
+    fontSize: 16,
+    background: 'lightblue',
+    width: 300
+  }
+  const errorstyleMessage = {
+    color: 'black',
+    fontStyle: 'italic',
+    fontSize: 16,
+    background: 'red',
+    width: 300
+  }
   return (
     <div>
       <h2>Phonebook</h2>
+      <div style={successMessage}>
+        {createdSuccess && createdSuccess}
+        {modifiedSuccess && modifiedSuccess}
+      </div>
+      <div style={errorstyleMessage}>{errorMessage && errorMessage}</div>
+
       <Filter handleOnChangeSearch={handleOnChangeSearch} search={search} />
 
       <h1>Add New</h1>

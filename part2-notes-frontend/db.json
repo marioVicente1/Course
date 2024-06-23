@@ -1,24 +1,14 @@
 {
   "persons": [
     {
-      "id": "6",
-      "name": "manuel",
-      "phone": "31231"
-    },
-    {
-      "id": "6",
-      "name": "juan jose",
-      "phone": "2323"
-    },
-    {
-      "id": "6",
-      "name": "juan",
-      "phone": "123"
-    },
-    {
       "id": "5",
-      "name": "dede",
-      "phone": "2"
+      "name": "sssfsfs",
+      "phone": "23324"
+    },
+    {
+      "id": "2",
+      "name": "dasdasda",
+      "phone": "312"
     }
   ]
 }
