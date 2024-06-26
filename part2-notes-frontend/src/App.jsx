@@ -1,159 +1,68 @@
 import { useEffect, useState } from 'react'
-import Filter from './components/Filter'
-import { PersonForm } from './components/PersonForm'
-import Persons from './components/Persons'
+// import Filter from './components/Filter'
+// import { PersonForm } from './components/PersonForm'
+import axios from 'axios'
+// import Persons from './components/Persons'
 import service from './services/persons'
+import Persons from './services/persons'
+import Country from './components/Persons'
+import Countries from './components/Persons'
+import CountrySpecific from './components/CountrySpecific'
 
 const App = () => {
-  const [persons, setPersons] = useState([])
-  const [newName, setNewName] = useState('')
-  const [newPhone, setnewPhone] = useState('')
-  const [search, setSearch] = useState('')
-  const [createdSuccess, setcreatedSuccess] = useState('')
-  const [modifiedSuccess, setmodifiedSuccess] = useState('')
-  const [errorMessage, seterrorMessage] = useState('')
+  const [countries, setcountries] = useState([])
+  console.log('🚀 ~ App ~ countries:', countries)
+  const [search, setsearch] = useState('')
+  console.log('🚀 ~ App ~ search:', search)
 
-  const handleOnChangeSearch = e => {
-    setSearch(e.target.value)
-  }
+  const [countryWeather, setcountryWeather] = useState({})
+  console.log('🚀 ~ App ~ countryWeather:', countryWeather)
 
-  const handleOnChange = e => {
-    setNewName(e.target.value)
-  }
-  const handleOnChangePhone = e => {
-    setnewPhone(e.target.value)
-  }
+  const apiKey = '4e0a44e9d6b446e1b9524424242606'
+  const baseUrl = 'http://api.weatherapi.com/v1'
+  const city = 'Ecuador'
+  const endpoint = `${baseUrl}/current.json?key=${apiKey}&q=${city}`
 
-  const handleSubmit = e => {
-    // try {
-    e.preventDefault()
-    const personObject = {
-      name: newName,
-      phone: newPhone,
-      id: `${persons.length + 1}`
-    }
-    const personExist = persons.find(person => person.name === newName)
-    if (personExist) {
-      if (personExist.phone !== newPhone) {
-        if (
-          window.confirm(
-            `${newName} is already added to phonebook, replace the old number with a new one?`
-          )
-        ) {
-          // try {
-          const updatePersons = { ...personExist, phone: newPhone }
-          service
-            .update(personExist.id, updatePersons)
-            .then(response => {
-              setPersons(
-                persons.map(person =>
-                  person.id !== personExist.id ? person : response.data
-                )
-              )
-              setNewName('')
-              setnewPhone('')
-              setmodifiedSuccess(
-                `The phone of ${personExist.name} modified with successs`
-              )
-              setTimeout(() => {
-                setmodifiedSuccess('')
-              }, 4000)
-            })
-            .catch(error => {
-              seterrorMessage(
-                'The information of user has already been removed from server'
-              )
-              setTimeout(() => {
-                seterrorMessage('')
-              }, 4000)
-            })
-          // } catch (error) {
-          //   seterrorMessage(
-          //     ' the information of user has already been removed from server '
-          //   )
-          // }
-        }
-      } else {
-        window.confirm(
-          `${newName} is already added to phonebook with the same number.`
-        )
-      }
-    } else {
-      service.create(personObject).then(response => {
-        setPersons([...persons, response.data])
-        setNewName('')
-        setnewPhone('')
-        setcreatedSuccess(`Added ${newName} `)
-        setTimeout(() => {
-          setcreatedSuccess(null)
-        }, 4000)
-      })
-    }
-    // } catch (error) {
-    //   seterrorMessage(
-    //     ' the information of user has already been removed from server '
-    //   )
-    //   setTimeout(() => {
-    //     seterrorMessage('')
-    //   }, 4000)
-    // }
+  const handleOnchange = e => {
+    setsearch(e.target.value)
   }
 
   useEffect(() => {
     service.getAll().then(response => {
-      setPersons(response.data)
+      // console.log('🚀 ~ useEffect ~ response:', response)
+      setcountries(response.data)
     })
+    axios
+      .get(endpoint)
+      .then(response => {
+        setcountryWeather(response.data)
+      })
+      .catch(error => {
+        console.error('Error fetching data:', error)
+      })
   }, [])
 
-  const onclickRemove = (id, name) => {
-    if (window.confirm(`Do you really want to delete this contact ${name}?`)) {
-      service.remove(id).then(() => {
-        setPersons(persons.filter(person => person.id !== id))
-      })
-    }
-  }
-  const filteredPersons = persons.filter(person =>
-    person?.name.toLowerCase().includes(search.toLowerCase())
-  )
-  const successMessage = {
-    color: 'green',
-    fontStyle: 'italic',
-    fontSize: 16,
-    background: 'lightblue',
-    width: 300
-  }
-  const errorstyleMessage = {
-    color: 'black',
-    fontStyle: 'italic',
-    fontSize: 16,
-    background: 'red',
-    width: 300
+  const searchCountry = search
+    ? countries.filter(country => country?.name.common.includes(search))
+    : []
+  console.log('🚀 ~ App ~ serchCountry:', searchCountry)
+
+  const onClick = name => {
+    setsearch(name)
   }
   return (
     <div>
-      <h2>Phonebook</h2>
-      <div style={successMessage}>
-        {createdSuccess && createdSuccess}
-        {modifiedSuccess && modifiedSuccess}
+      <h1> Find your Country</h1>
+      <div>
+        Find countries <input value={search} onChange={handleOnchange} />
       </div>
-      <div style={errorstyleMessage}>{errorMessage && errorMessage}</div>
-
-      <Filter handleOnChangeSearch={handleOnChangeSearch} search={search} />
-
-      <h1>Add New</h1>
-      <PersonForm
-        handleSubmit={handleSubmit}
-        newName={newName}
-        handleOnChange={handleOnChange}
-        newPhone={newPhone}
-        handleOnChangePhone={handleOnChangePhone}
-      />
-
-      <h2>Numbers</h2>
-      <Persons
-        filteredPersons={filteredPersons}
-        onclickRemove={onclickRemove}
-      />
+      {searchCountry.length > 10 ? (
+        'Too many matches, specify another filter'
+      ) : searchCountry.length > 1 ? (
+        <Countries filteredPersons={searchCountry} onClick={onClick} />
+      ) : searchCountry.length === 1 ? (
+        <CountrySpecific country={searchCountry[0]} weather={countryWeather} />
+      ) : null}
     </div>
   )
 }

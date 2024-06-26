@@ -1,18 +1,16 @@
 import React from 'react'
 
-const Persons = ({ filteredPersons, onclickRemove }) => {
+const Countries = ({ filteredPersons, onClick }) => {
   return (
     <div>
       {filteredPersons.map((item, index) => (
-        <li key={index}>
-          {item.name}, {item.phone}{' '}
-          <button onClick={() => onclickRemove(item.id, item.name)}>
-            Delete
-          </button>
-        </li>
+        <div key={index} style={{ display: 'flex' }}>
+          <li>{item.name.common},</li>{' '}
+          <button onClick={() => onClick(item.name.common)}>show</button>
+        </div>
       ))}
     </div>
   )
 }
 
-export default Persons
+export default Countries
