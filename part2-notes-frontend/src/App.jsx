@@ -25,12 +25,10 @@ const App = () => {
   }
 
   const handleSubmit = e => {
-    // try {
     e.preventDefault()
     const personObject = {
       name: newName,
-      phone: newPhone,
-      id: `${persons.length + 1}`
+      phone: newPhone
     }
     const personExist = persons.find(person => person.name === newName)
     if (personExist) {
@@ -40,7 +38,6 @@ const App = () => {
             `${newName} is already added to phonebook, replace the old number with a new one?`
           )
         ) {
-          // try {
           const updatePersons = { ...personExist, phone: newPhone }
           service
             .update(personExist.id, updatePersons)
@@ -67,11 +64,6 @@ const App = () => {
                 seterrorMessage('')
               }, 4000)
             })
-          // } catch (error) {
-          //   seterrorMessage(
-          //     ' the information of user has already been removed from server '
-          //   )
-          // }
         }
       } else {
         window.confirm(
@@ -89,14 +81,6 @@ const App = () => {
         }, 4000)
       })
     }
-    // } catch (error) {
-    //   seterrorMessage(
-    //     ' the information of user has already been removed from server '
-    //   )
-    //   setTimeout(() => {
-    //     seterrorMessage('')
-    //   }, 4000)
-    // }
   }
 
   useEffect(() => {
@@ -113,7 +97,7 @@ const App = () => {
     }
   }
   const filteredPersons = persons.filter(person =>
-    person?.name.toLowerCase().includes(search.toLowerCase())
+    person?.name?.toLowerCase().includes(search.toLowerCase())
   )
   const successMessage = {
     color: 'green',
