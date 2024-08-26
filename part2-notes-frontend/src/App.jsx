@@ -71,15 +71,23 @@ const App = () => {
         )
       }
     } else {
-      service.create(personObject).then(response => {
-        setPersons([...persons, response.data])
-        setNewName('')
-        setnewPhone('')
-        setcreatedSuccess(`Added ${newName} `)
-        setTimeout(() => {
-          setcreatedSuccess(null)
-        }, 4000)
-      })
+      service
+        .create(personObject)
+        .then(response => {
+          setPersons([...persons, response.data])
+          setNewName('')
+          setnewPhone('')
+          setcreatedSuccess(`Added ${newName} `)
+          setTimeout(() => {
+            setcreatedSuccess(null)
+          }, 4000)
+        })
+        .catch(error => {
+          seterrorMessage(error.response.data.error)
+          setTimeout(() => {
+            seterrorMessage('')
+          }, 4000)
+        })
     }
   }
 

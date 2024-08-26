@@ -15,7 +15,7 @@ export const PersonForm = ({
       <br />
       <div>
         phone:{' '}
-        <input value={newPhone} onChange={handleOnChangePhone} type="number" />
+        <input value={newPhone} onChange={handleOnChangePhone} type="text" />
       </div>
       <br />
       <button type="submit">add</button>
